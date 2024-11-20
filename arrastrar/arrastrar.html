@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clasificación de Palabras</title>
+    <link rel="stylesheet" href="cssarrastrar.css">
+</head>
+<body>
+    <h1>Clasificación de Palabras</h1>
+    <p>Arrastra cada palabra a la categoría correspondiente:</p>
+    <div id="palabras" class="contenedor">
+        <div class="palabra" draggable="true" data-categoria="Frutas">Manzana</div>
+        <div class="palabra" draggable="true" data-categoria="Animales">Perro</div>
+        <div class="palabra" draggable="true" data-categoria="Colores">Rojo</div>
+        <div class="palabra" draggable="true" data-categoria="Frutas">Plátano</div>
+        <div class="palabra" draggable="true" data-categoria="Animales">Gato</div>
+        <div class="palabra" draggable="true" data-categoria="Colores">Azul</div>
+    </div>
+    <div class="contenedor">
+        <div class="categoria" data-categoria="Frutas">
+            <h3>Frutas</h3>
+        </div>
+        <div class="categoria" data-categoria="Animales">
+            <h3>Animales</h3>
+        </div>
+        <div class="categoria" data-categoria="Colores">
+            <h3>Colores</h3>
+        </div>
+    </div>
+    <button id="validar">Validar</button>
+    <script>
+        const palabras = document.querySelectorAll('.palabra');
+        const categorias = document.querySelectorAll('.categoria');
+        const validarBtn = document.getElementById('validar');
+
+        // Arrastrar y soltar
+        palabras.forEach(palabra => {
+            palabra.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', e.target.dataset.categoria);
+                e.dataTransfer.setData('palabra-id', e.target.innerText);
+            });
+        });
+
+        categorias.forEach(categoria => {
+            categoria.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+
+            categoria.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const categoriaArrastrada = e.dataTransfer.getData('text/plain');
+                const palabraArrastrada = e.dataTransfer.getData('palabra-id');
+
+                // Verificar si ya existe la palabra en el contenedor
+                const palabraExistente = [...categoria.querySelectorAll('.palabra')]
+                    .find(palabra => palabra.innerText === palabraArrastrada);
+
+                if (!palabraExistente) {
+                    const palabraElemento = [...document.querySelectorAll('.palabra')]
+                        .find(palabra => palabra.innerText === palabraArrastrada);
+                    categoria.appendChild(palabraElemento);
+                }
+            });
+        });
+
+        // Validación
+        validarBtn.addEventListener('click', () => {
+            palabras.forEach(palabra => {
+                const categoriaPadre = palabra.closest('.categoria');
+                if (categoriaPadre && categoriaPadre.dataset.categoria === palabra.dataset.categoria) {
+                    palabra.classList.add('correcto');
+                    palabra.classList.remove('incorrecto');
+                } else {
+                    palabra.classList.add('incorrecto');
+                    palabra.classList.remove('correcto');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
